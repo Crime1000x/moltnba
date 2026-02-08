@@ -266,6 +266,12 @@ class AgentService {
     return new ethers.Wallet(privateKey, provider);
   }
 
+  static getAgentWalletFromEncrypted(walletEncrypted, rpcUrl) {
+    const privateKey = this.decryptPrivateKey(walletEncrypted);
+    const provider = new ethers.JsonRpcProvider(rpcUrl || 'https://data-seed-prebsc-1-s1.binance.org:8545');
+    return new ethers.Wallet(privateKey, provider);
+  }
+
   /**
    * 铸造 NFA Token
    */
@@ -278,19 +284,21 @@ class AgentService {
       throw new Error('Agent already has NFA token');
     }
 
-    const wallet = await this.getAgentWallet(agentId);
     const nfaAddress = process.env.MOLTNFA_CONTRACT_ADDRESS;
     if (!nfaAddress) {
       throw new Error('NFA contract address not configured');
     }
 
-    // 简化的 ABI
-    const abi = [
-      'function registerAgent(string memory _name) external returns (uint256)'
-    ];
-    const contract = new ethers.Contract(nfaAddress, abi, wallet);
+    // 使用 sponsor/owner 钱包调用 mintFree
+    const provider = new ethers.JsonRpcProvider(process.env.BSC_TESTNET_RPC || 'https://data-seed-prebsc-1-s1.binance.org:8545');
+    const sponsorWallet = new ethers.Wallet(process.env.SPONSOR_WALLET_PRIVATE_KEY, provider);
 
-    const tx = await contract.registerAgent(agent.name);
+    const abi = [
+      'function mintFree(address to, string memory persona, string memory experience) external returns (uint256)'
+    ];
+    const contract = new ethers.Contract(nfaAddress, abi, sponsorWallet);
+
+    const tx = await contract.mintFree(agent.wallet_address, agent.name, "0");
     const receipt = await tx.wait();
 
     // 从事件中获取 tokenId (假设事件有 tokenId)
