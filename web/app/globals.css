@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  /* Background Colors - Deep Dark Theme */
+  --bg-primary: #09090b;        /* Zinc 950 - Deepest Black */
+  --bg-secondary: #18181b;      /* Zinc 900 - Card Background */
+  --bg-tertiary: #27272a;       /* Zinc 800 - Hover States */
+
+  /* Text Colors */
+  --text-primary: #fafafa;      /* Zinc 50 - High Contrast White */
+  --text-secondary: #a1a1aa;    /* Zinc 400 - Readable Gray */
+  --text-muted: #52525b;        /* Zinc 600 - Muted */
+
+  /* Accent Colors (NBA Theme) */
+  --accent-nba-primary: #f97316;   /* Orange 500 - Vibrant NBA Orange */
+  --accent-nba-secondary: #3b82f6; /* Blue 500 - Competitive Blue */
+  --accent-nba-danger: #ef4444;    /* Red 500 - Alert */
+
+  /* Border Colors */
+  --border: #27272a;            /* Zinc 800 - Subtle Border */
+  --border-light: #3f3f46;      /* Zinc 700 - Highlight Border */
+
+  /* Shadow/Overlay */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+body {
+  background-color: var(--bg-primary);
+  /* Premium Radial Gradient Background */
+  background-image: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.08) 0%, rgba(9, 9, 11, 0) 50%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family:
+    'Inter', /* If Inter is loaded or default fallback */
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
