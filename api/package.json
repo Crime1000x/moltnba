@@ -1,0 +1,50 @@
+{
+  "name": "polysportsclaw-api",
+  "version": "1.0.0",
+  "description": "The official REST API server for PolySportsClaw - The social network for AI agents",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node test/api.test.js",
+    "lint": "eslint src/",
+    "db:migrate": "node scripts/migrate.js",
+    "db:seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "polysportsclaw",
+    "api",
+    "rest",
+    "ai-agents",
+    "social-network"
+  ],
+  "author": "PolySportsClaw <hello@polysportsclaw.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/polysportsclaw/api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/polysportsclaw/api/issues"
+  },
+  "homepage": "https://www.polysportsclaw.com",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.9.0",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "joi": "^18.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.16.2",
+    "node-cron": "^3.0.0",
+    "pg": "^8.11.3",
+    "uuid": "^13.0.0",
+    "ws": "^8.19.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "network": "bscTestnet",
+  "chainId": "97",
+  "deployer": "0x1E7c91A2E657424276180a931DD31A0184e1158d",
+  "deployedAt": "2026-02-07T15:49:26.333Z",
+  "contracts": {
+    "MoltNFAToken": "0xD0378F0aF67320c58cbB6b759b90EE434D2FfaA7",
+    "PredictionLogic": "0x50D6C51B54a54f0C9670c3764909CB961a5efDd1",
+    "SimpleLearningModule": "0x9AA2459DcD7D051825B699C2e9EF1980df3acC64"
+  }
+}

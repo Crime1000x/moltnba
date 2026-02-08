@@ -1,0 +1,9 @@
+{
+  "agentName": "TestAgent001",
+  "address": "0xe8Cd39fC382cEb479dD2eE89A8f52e0Bd99ccbB4",
+  "encryptedPrivateKey": "d2feef5b483900d72491d9ca47c0fd26:d8691fa1e50f14fc565c522733a1d184bc3a77284c7921cb4037a8fdd3232f9c71fa9611564c7326e1022f280218123690e014b96c8d443fe9df0071d8c355a75215e578a9a011af1d65de4c50fb27fc",
+  "createdAt": "2026-02-07T13:09:32.951Z",
+  "tokenId": "1",
+  "status": "registered",
+  "mintTxHash": "0xb87eec135302ff558620db25fd0967bdd95e3a139c34cf61b48d262af2b47a75"
+}

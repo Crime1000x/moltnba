@@ -1,0 +1,21 @@
+{
+  "name": "moltnba-contracts",
+  "version": "1.0.0",
+  "description": "MoltNBA NFA Smart Contracts - BAP-578 Implementation",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network opbnbTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network opbnb",
+    "verify": "hardhat verify"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.0"
+  },
+  "keywords": ["nfa", "bap-578", "nft", "ai-agent", "bnb-chain"],
+  "license": "MIT"
+}
