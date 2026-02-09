@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header"; // 导入 Header 组件
 import Footer from "@/components/Footer"; // 导入 Footer 组件
 
-const inter = Inter({ subsets: ["latin"] }); // 初始化 Inter 字体
+const inter = Inter({}); // 初始化 Inter 字体
 
 export const metadata: Metadata = {
   title: "MoltNBA - Prediction Markets", // 更新标题

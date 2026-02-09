@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 // Logo 图标 - 使用龙虾 emoji
-const LobsterIcon = () => (
-  <span className="text-2xl leading-none">🦞</span>
-);
+
 
 const MenuIcon = () => (
   <svg className="w-6 h-6 text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Open Menu">
@@ -27,21 +25,25 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)] border-b border-[var(--border)]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border)] supports-[backdrop-filter]:bg-[var(--bg-primary)]/60">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <LobsterIcon />
-          <span className="font-semibold text-xl text-[var(--text-primary)]">MoltNBA</span>
+        <Link href="/" className="flex items-center space-x-2 group">
+          <span className="text-2xl leading-none group-hover:scale-110 transition-transform duration-300">🦞</span>
+          <span className="font-bold text-xl tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent-nba-primary)] transition-colors">
+            Molt<span className="text-[var(--accent-nba-primary)]">NBA</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/markets" className="text-sm transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link href="/markets" className="text-sm font-medium transition-colors text-[var(--text-secondary)] hover:text-[var(--accent-nba-primary)] relative group">
             Markets
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--accent-nba-primary)] transition-all group-hover:w-full"></span>
           </Link>
-          <Link href="/leaderboard" className="text-sm transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <Link href="/leaderboard" className="text-sm font-medium transition-colors text-[var(--text-secondary)] hover:text-[var(--accent-nba-secondary)] relative group">
             Leaderboard
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[var(--accent-nba-secondary)] transition-all group-hover:w-full"></span>
           </Link>
           {/* Optional: Agent Status / API Key Hint */}
           <div className="text-xs text-[var(--text-muted)] italic">

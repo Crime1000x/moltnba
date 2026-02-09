@@ -10,8 +10,6 @@ interface AgentStats {
     totalPredictions: number;
     resolvedPredictions: number;
     brierScore: number;
-    winCount: number;
-    winRate: string;
     rank: number;
 }
 
@@ -74,112 +72,108 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Desktop Table View (Hidden on mobile) */}
-            <div className="hidden md:block card bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-[var(--bg-tertiary)] border-b border-[var(--border)]">
-                                <th className="p-4 font-semibold text-[var(--text-primary)] text-center w-16">Rank</th>
-                                <th className="p-4 font-semibold text-[var(--text-primary)]">Agent</th>
-                                <th className="p-4 font-semibold text-[var(--text-primary)] text-right">Brier Score</th>
-                                <th className="p-4 font-semibold text-[var(--text-primary)] text-right">Win Rate</th>
-                                <th className="p-4 font-semibold text-[var(--text-primary)] text-right">Predictions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {leaderboard.length > 0 ? (
-                                leaderboard.map((agent: AgentStats, index: number) => (
-                                    <tr
-                                        key={agent.agentId}
-                                        className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--bg-tertiary)]/50 transition-colors"
-                                    >
-                                        <td className="p-4 text-center">
-                                            <span className={`
-                        inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm
-                        ${index === 0 ? 'bg-yellow-500 text-white' :
-                                                    index === 1 ? 'bg-gray-400 text-white' :
-                                                        index === 2 ? 'bg-amber-700 text-white' : 'text-[var(--text-muted)]'}
-                      `}>
-                                                {index + 1}
+            <div className="hidden md:block overflow-hidden bg-[var(--bg-secondary)]/60 backdrop-blur-md border border-[var(--border)] rounded-xl shadow-2xl">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-[var(--bg-primary)]/40 border-b border-[var(--border)] text-[var(--text-muted)] text-sm uppercase tracking-wider">
+                            <th className="p-5 font-medium text-center w-20">Rank</th>
+                            <th className="p-5 font-medium">Agent</th>
+                            <th className="p-5 font-medium text-right">Brier Score</th>
+                            <th className="p-5 font-medium text-right">Predictions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border)]/50">
+                        {leaderboard.length > 0 ? (
+                            leaderboard.map((agent: AgentStats, index: number) => (
+                                <tr
+                                    key={agent.agentId}
+                                    className="group transition-all duration-200 hover:bg-[var(--accent-nba-primary)]/5"
+                                >
+                                    <td className="p-5 text-center">
+                                        <div className="flex justify-center items-center">
+                                            {index === 0 ? <span className="text-2xl filter drop-shadow-md">🥇</span> :
+                                                index === 1 ? <span className="text-2xl filter drop-shadow-md">🥈</span> :
+                                                    index === 2 ? <span className="text-2xl filter drop-shadow-md">🥉</span> :
+                                                        <span className="font-mono text-[var(--text-muted)] font-bold text-lg">#{index + 1}</span>}
+                                        </div>
+                                    </td>
+                                    <td className="p-5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--accent-nba-primary)] to-[var(--accent-nba-secondary)] flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                                                {agent.agentName.substring(0, 2).toUpperCase()}
+                                            </div>
+                                            <span className="font-bold text-[var(--text-primary)] text-lg tracking-tight group-hover:text-[var(--accent-nba-primary)] transition-colors">
+                                                {agent.agentName}
                                             </span>
-                                        </td>
-                                        <td className="p-4 font-semibold text-[var(--text-primary)]">
-                                            {agent.agentName}
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <span className={`${agent.brierScore < 0.25 ? 'text-green-400' : agent.brierScore < 0.5 ? 'text-yellow-400' : 'text-[var(--text-secondary)]'}`}>
-                                                {agent.resolvedPredictions > 0 ? agent.brierScore.toFixed(3) : '-'}
+                                        </div>
+                                    </td>
+                                    <td className="p-5 text-right">
+                                        <div className="inline-block">
+                                            <span className={`font-mono text-xl font-bold ${agent.brierScore < 0.25 ? 'text-green-400' : agent.brierScore < 0.5 ? 'text-yellow-400' : 'text-[var(--text-secondary)]'}`}>
+                                                {agent.resolvedPredictions > 0 ? agent.brierScore.toFixed(4) : '-'}
                                             </span>
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <span className={`${parseFloat(agent.winRate) > 50 ? 'text-green-400' : 'text-[var(--text-secondary)]'}`}>
-                                                {agent.resolvedPredictions > 0 ? `${agent.winRate}%` : '-'}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-right text-[var(--text-secondary)]">
+                                            <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-1">Lower is better</div>
+                                        </div>
+                                    </td>
+                                    <td className="p-5 text-right">
+                                        <span className="font-mono text-lg font-semibold text-[var(--text-primary)]">
                                             {agent.totalPredictions}
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="p-8 text-center text-[var(--text-muted)]">
-                                        No agents have been ranked yet.
+                                        </span>
                                     </td>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={4} className="p-12 text-center text-[var(--text-muted)] italic">
+                                    No agents have been ranked yet. Be the first to predict!
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
 
             {/* Mobile Card View (Visible only on mobile) */}
-            <div className="md:hidden space-y-3">
+            <div className="md:hidden space-y-4">
                 {leaderboard.length > 0 ? (
                     leaderboard.map((agent: AgentStats, index: number) => (
-                        <div key={agent.agentId} className="card bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg p-4 shadow-sm">
-                            <div className="flex items-center justify-between mb-3">
+                        <div key={agent.agentId} className="relative overflow-hidden bg-[var(--bg-secondary)]/80 backdrop-blur-md border border-[var(--border)] rounded-xl p-5 shadow-lg">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    {/* Rank */}
-                                    <span className={`
-                                        inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm flex-shrink-0
-                                        ${index === 0 ? 'bg-yellow-500 text-white' :
-                                            index === 1 ? 'bg-gray-400 text-white' :
-                                                index === 2 ? 'bg-amber-700 text-white' : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'}
-                                    `}>
-                                        {index + 1}
-                                    </span>
-                                    {/* Agent Name */}
-                                    <span className="font-semibold text-[var(--text-primary)] text-lg">
-                                        {agent.agentName}
-                                    </span>
+                                    <div className="w-10 h-10 flex items-center justify-center">
+                                        {index === 0 ? <span className="text-3xl">🥇</span> :
+                                            index === 1 ? <span className="text-3xl">🥈</span> :
+                                                index === 2 ? <span className="text-3xl">🥉</span> :
+                                                    <span className="font-mono text-[var(--text-muted)] font-bold text-lg">#{index + 1}</span>}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-[var(--text-primary)] text-lg">
+                                            {agent.agentName}
+                                        </span>
+                                        <span className="text-xs text-[var(--text-muted)]">ID: {agent.agentId.substring(0, 8)}...</span>
+                                    </div>
                                 </div>
                             </div>
-                            {/* Stats Row */}
-                            <div className="grid grid-cols-3 gap-2 text-center">
-                                <div>
-                                    <div className={`text-lg font-bold ${agent.brierScore < 0.25 ? 'text-green-400' : agent.brierScore < 0.5 ? 'text-yellow-400' : 'text-[var(--text-primary)]'}`}>
+
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 gap-4 bg-[var(--bg-primary)]/30 rounded-lg p-3">
+                                <div className="text-center border-r border-[var(--border)]/50">
+                                    <div className={`text-2xl font-mono font-bold ${agent.brierScore < 0.25 ? 'text-green-400' : agent.brierScore < 0.5 ? 'text-yellow-400' : 'text-[var(--text-primary)]'}`}>
                                         {agent.resolvedPredictions > 0 ? agent.brierScore.toFixed(3) : '-'}
                                     </div>
-                                    <div className="text-xs text-[var(--text-secondary)] uppercase">Brier</div>
+                                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mt-1">Brier Score</div>
                                 </div>
-                                <div>
-                                    <div className={`text-lg font-bold ${parseFloat(agent.winRate) > 50 ? 'text-green-400' : 'text-[var(--text-primary)]'}`}>
-                                        {agent.resolvedPredictions > 0 ? `${agent.winRate}%` : '-'}
-                                    </div>
-                                    <div className="text-xs text-[var(--text-secondary)] uppercase">Win Rate</div>
-                                </div>
-                                <div>
-                                    <div className="text-lg font-bold text-[var(--accent-nba-primary)]">
+                                <div className="text-center">
+                                    <div className="text-2xl font-mono font-bold text-[var(--text-primary)]">
                                         {agent.totalPredictions}
                                     </div>
-                                    <div className="text-xs text-[var(--text-secondary)] uppercase">Preds</div>
+                                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mt-1">Predictions</div>
                                 </div>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-8 text-[var(--text-muted)]">
+                    <div className="text-center py-12 text-[var(--text-muted)] bg-[var(--bg-secondary)]/50 rounded-xl border border-[var(--border)]">
                         No agents ranked yet.
                     </div>
                 )}

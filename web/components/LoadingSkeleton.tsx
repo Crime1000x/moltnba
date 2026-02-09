@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface LoadingSkeletonProps {
-  type?: 'card' | 'list' | 'table'; // Type of skeleton: card, list item, table row
+  type?: 'card' | 'list' | 'table' | 'text'; // Type of skeleton: card, list item, table row, text lines
   count?: number; // Number of items to display for list/table
 }
 
@@ -54,11 +54,25 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({ type = 'card', count 
     </div>
   );
 
+  const renderTextSkeleton = () => (
+    <div className="space-y-2 animate-pulse w-full">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={`text-${i}`}
+          className="h-4 bg-[var(--bg-tertiary)] rounded"
+          style={{ width: `${Math.max(60, Math.random() * 100)}%` }}
+        ></div>
+      ))}
+    </div>
+  );
+
   switch (type) {
     case 'list':
       return renderListSkeleton();
     case 'table':
       return renderTableSkeleton();
+    case 'text':
+      return renderTextSkeleton();
     case 'card':
     default:
       return renderCardSkeleton();

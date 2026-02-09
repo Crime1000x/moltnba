@@ -1,5 +1,6 @@
 // polysportsclaw-web-client-application/app/markets/page.tsx
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 import MarketListCard from '@/components/MarketListCard';
 import ErrorCard from '@/components/ErrorCard';
 import EmptyStateCard from '@/components/EmptyStateCard';
