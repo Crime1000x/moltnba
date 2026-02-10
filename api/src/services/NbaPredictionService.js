@@ -58,10 +58,12 @@ class NbaPredictionService {
 
   static async getRecentPredictions(limit = 10) {
     return queryAll(
-      `SELECT p.*, a.name as agent_name, m.title as market_title
+      `SELECT p.*, a.name as agent_name, m.title as market_title,
+         o.name as outcome_name, o.outcome_value
        FROM nba_predictions p
        JOIN agents a ON p.agent_id = a.id
        JOIN nba_markets m ON p.nba_market_id = m.id
+       JOIN nba_market_outcomes o ON p.predicted_outcome_id = o.id
        ORDER BY p.created_at DESC
        LIMIT ?`,
       [limit]
@@ -139,10 +141,11 @@ class NbaPredictionService {
   }
 
   /**
-   * 获取市场预测对比数据
+   * 获取市场预测对比数据（支持新旧ID）
    */
   static async getMarketComparison(marketId) {
-    const predictions = await queryAll(
+    // 先查新表 nba_predictions
+    let predictions = await queryAll(
       `SELECT p.*, a.name as agent_name, o.name as outcome_name, o.outcome_value
        FROM nba_predictions p
        JOIN agents a ON p.agent_id = a.id
@@ -151,6 +154,21 @@ class NbaPredictionService {
        ORDER BY p.p_value DESC`,
       [marketId]
     );
+    
+    // 如果没找到，查旧表 predictions
+    if (predictions.length === 0) {
+      predictions = await queryAll(
+        `SELECT p.id, p.agent_id, p.game_id, p.p_home as p_value, p.rationale,
+           a.name as agent_name,
+           CASE WHEN p.p_home > 0.5 THEN 'home' ELSE 'away' END as outcome_value,
+           p.home_team as home_name, p.away_team as away_name
+         FROM predictions p
+         JOIN agents a ON p.agent_id = a.id
+         WHERE p.game_id = ?
+         ORDER BY p.p_home DESC`,
+        [marketId]
+      );
+    }
     
     const homeVotes = predictions.filter(p => p.outcome_value === 'home').length;
     const awayVotes = predictions.filter(p => p.outcome_value === 'away').length;

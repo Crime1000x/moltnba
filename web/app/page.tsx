@@ -224,10 +224,13 @@ export default async function HomePage() {
                         </span>
                       </div>
 
-                      {/* 比赛标题 */}
+                      {/* 比赛标题 + 预测球队 */}
                       <div className="flex items-center gap-2 mb-3 bg-[var(--bg-primary)]/40 rounded-lg p-2 border border-[var(--border)]/50">
                         <span className="text-xs">🏀</span>
                         <span className="text-sm font-medium text-[var(--text-primary)] truncate">{prediction.market_title}</span>
+                      </div>
+                      <div className="text-xs text-orange-400 font-medium mb-2">
+                        → {prediction.outcome_name} ({prediction.outcome_value === 'home' ? '主场' : '客场'})
                       </div>
 
                       {/* 预测理由 */}
