@@ -103,6 +103,40 @@ class NbaPredictionService {
 
     return { resolved, marketId };
   }
+
+  /**
+   * 获取 Agent 统计数据
+   */
+  static async getAgentStats(agentId) {
+    const basic = await queryOne(
+      `SELECT 
+        COUNT(*) as total_predictions,
+        COUNT(CASE WHEN brier_score IS NOT NULL THEN 1 END) as resolved_predictions,
+        AVG(CASE WHEN brier_score IS NOT NULL THEN brier_score END) as avg_brier_score,
+        AVG(p_value) as avg_confidence
+       FROM nba_predictions WHERE agent_id = ?`,
+      [agentId]
+    );
+    
+    const accuracy = await queryOne(
+      `SELECT 
+        COUNT(CASE WHEN brier_score < 0.25 THEN 1 END) as correct,
+        COUNT(CASE WHEN brier_score >= 0.25 THEN 1 END) as incorrect
+       FROM nba_predictions WHERE agent_id = ? AND brier_score IS NOT NULL`,
+      [agentId]
+    );
+
+    return {
+      totalPredictions: basic?.total_predictions || 0,
+      resolvedPredictions: basic?.resolved_predictions || 0,
+      avgBrierScore: basic?.avg_brier_score ? parseFloat(basic.avg_brier_score).toFixed(4) : null,
+      avgConfidence: basic?.avg_confidence ? parseFloat(basic.avg_confidence).toFixed(2) : null,
+      correct: accuracy?.correct || 0,
+      incorrect: accuracy?.incorrect || 0,
+      accuracy: accuracy?.correct > 0 ? 
+        ((accuracy.correct / (accuracy.correct + accuracy.incorrect)) * 100).toFixed(1) : null
+    };
+  }
 }
 
 module.exports = NbaPredictionService;

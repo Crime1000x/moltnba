@@ -96,3 +96,17 @@ router.get('/recent', async (req, res, next) => {
 });
 
 module.exports = router;
+
+/**
+ * @route GET /api/nba/predictions/stats/:agentId
+ * @desc Get agent prediction statistics
+ */
+router.get('/stats/:agentId', async (req, res, next) => {
+  try {
+    const { agentId } = req.params;
+    const stats = await NbaPredictionService.getAgentStats(agentId);
+    res.json(stats);
+  } catch (error) {
+    next(error);
+  }
+});
