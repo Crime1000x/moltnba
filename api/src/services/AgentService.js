@@ -127,6 +127,11 @@ class AgentService {
     return result;
   }
 
+  // Alias for auth middleware
+  static async findByApiKey(token) {
+    return this.getByToken(token);
+  }
+
   /**
    * 通过 ID 获取 Agent
    * @param {string} id - Agent ID

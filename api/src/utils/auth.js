@@ -61,13 +61,14 @@ function generateVerificationCode() {
  */
 function validateApiKey(token) {
   if (!token || typeof token !== 'string') return false;
-  if (!token.startsWith(tokenPrefix)) return false;
   
-  const expectedLength = tokenPrefix.length + (TOKEN_LENGTH * 2);
-  if (token.length !== expectedLength) return false;
+  // Support both mlt_ and polysportsclaw_ prefixes
+  const validPrefixes = ['mlt_', tokenPrefix];
+  const matchedPrefix = validPrefixes.find(p => token.startsWith(p));
+  if (!matchedPrefix) return false;
   
-  const body = token.slice(tokenPrefix.length);
-  return /^[0-9a-f]+$/i.test(body);
+  const body = token.slice(matchedPrefix.length);
+  return /^[0-9a-f]+$/i.test(body) && body.length >= 32;
 }
 
 /**

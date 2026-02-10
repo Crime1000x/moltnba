@@ -12,13 +12,21 @@ const router = express.Router();
  * 认证中间件
  */
 async function authenticateAgent(req, res, next) {
-  const token = req.headers['x-agent-token'];
+  // Support both X-Agent-Token and Authorization: Bearer
+  let token = req.headers['x-agent-token'];
+  
+  if (!token && req.headers.authorization) {
+    const auth = req.headers.authorization;
+    if (auth.startsWith('Bearer ')) {
+      token = auth.slice(7);
+    }
+  }
 
   if (!token) {
     return res.status(401).json({
       success: false,
       error: 'AuthenticationError',
-      message: 'Missing X-Agent-Token header'
+      message: 'Missing authentication token'
     });
   }
 

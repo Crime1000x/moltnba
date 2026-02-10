@@ -94,14 +94,37 @@ class PolymarketDataService {
    * Get all active markets from DB.
    */
   static async getActiveMarkets() {
-    return queryAll(`SELECT * FROM polymarket_events WHERE status = 'active' ORDER BY created_at DESC`);
+    return queryAll(`SELECT * FROM polymarket_markets WHERE status = 'open' ORDER BY created_at DESC`);
   }
 
   /**
    * Get market by Polymarket ID.
    */
   static async getMarketByPolymarketId(polymarketId) {
-    return queryOne(`SELECT * FROM polymarket_events WHERE polymarket_id = ?`, [polymarketId]);
+    return queryOne(`SELECT * FROM polymarket_markets WHERE market_id = ?`, [polymarketId]);
+  }
+
+  /**
+   * Get markets by status and end time (for result processing).
+   */
+  static async getMarketsByStatusAndEndTime({ status = [], endTimeBefore = null } = {}) {
+    let query = `SELECT * FROM polymarket_markets WHERE 1=1`;
+    const params = [];
+
+    if (status && status.length > 0) {
+      const placeholders = status.map(() => '?').join(', ');
+      query += ` AND status IN (${placeholders})`;
+      params.push(...status);
+    }
+
+    if (endTimeBefore) {
+      query += ` AND end_time IS NOT NULL AND end_time < ?`;
+      params.push(endTimeBefore);
+    }
+
+    query += ` ORDER BY end_time ASC`;
+
+    return queryAll(query, params);
   }
 }
 
