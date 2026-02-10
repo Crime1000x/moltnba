@@ -11,6 +11,7 @@ const { initializePool, healthCheck } = require('./config/database');
 const { startPolymarketFetcher } = require('./jobs/polymarket-fetcher'); // Import the fetcher job
 const { startPolymarketResultProcessor } = require('./jobs/polymarket-result-processor'); // Import the result processor job
 const { startOddsCollector } = require('./jobs/odds-collector'); // 赔率采集任务
+const { startNbaResultProcessor } = require('./jobs/nba-result-processor'); // NBA结算任务
 const { scheduler } = require('./services/SettlementScheduler'); // 自动结算任务
 
 async function start() {
@@ -27,6 +28,7 @@ async function start() {
       startPolymarketFetcher();
       startPolymarketResultProcessor();
       startOddsCollector();  // 启动赔率采集任务
+      startNbaResultProcessor(); // 启动NBA结算任务
       scheduler.start(60 * 60 * 1000); // 每小时自动结算
     } else {
       console.warn('Database not available, running in limited mode');
