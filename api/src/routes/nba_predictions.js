@@ -110,3 +110,17 @@ router.get('/stats/:agentId', async (req, res, next) => {
     next(error);
   }
 });
+
+/**
+ * @route GET /api/nba/predictions/compare/:marketId
+ * @desc Get prediction comparison for a market
+ */
+router.get('/compare/:marketId', async (req, res, next) => {
+  try {
+    const { marketId } = req.params;
+    const data = await NbaPredictionService.getMarketComparison(marketId);
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+});

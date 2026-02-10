@@ -263,6 +263,7 @@ export default function MarketDetailPage() {
   const [game, setGame] = useState<any>(null);
   const [odds, setOdds] = useState<any>(null);
   const [predictions, setPredictions] = useState<AgentPrediction[]>([]);
+  const [consensus, setConsensus] = useState<{home: string, away: string, total: number} | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingOdds, setLoadingOdds] = useState(false);
   const [loadingPredictions, setLoadingPredictions] = useState(false);
@@ -295,21 +296,18 @@ export default function MarketDetailPage() {
     }
   };
 
-  // 获取比赛的 Agent 预测
+  // 获取比赛的 Agent 预测对比
   const fetchPredictions = async (gameId: string) => {
     setLoadingPredictions(true);
     try {
       const API_BASE_URL = (typeof window === 'undefined')
         ? 'http://localhost:3001'
         : (process.env.NEXT_PUBLIC_API_BASE_URL || '');
-      const res = await fetch(`${API_BASE_URL}/api/v1/nba/predictions/market/${gameId}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/nba/predictions/compare/${gameId}`);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setPredictions(data);
-        } else if (data.success && data.predictions) {
-          setPredictions(data.predictions);
-        }
+        setPredictions(data.predictions || []);
+        setConsensus(data.consensus || null);
       }
     } catch (err) {
       console.error('Error fetching predictions:', err);
@@ -490,6 +488,24 @@ export default function MarketDetailPage() {
           </div>
         ) : predictions.length > 0 ? (
           <div className="space-y-4">
+            {/* 共识对比条 */}
+            {consensus && consensus.total > 0 && (
+              <div className="bg-[var(--bg-secondary)] rounded-xl p-4 border border-[var(--border)]">
+                <div className="text-sm text-[var(--text-secondary)] mb-2">Agent Consensus ({consensus.total} predictions)</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium w-16">Away</span>
+                  <div className="flex-1 h-6 bg-[var(--bg-tertiary)] rounded-full overflow-hidden flex">
+                    <div className="bg-blue-500 h-full flex items-center justify-center text-xs text-white font-bold" style={{width: `${consensus.away}%`}}>
+                      {parseInt(consensus.away) > 10 ? `${consensus.away}%` : ''}
+                    </div>
+                    <div className="bg-orange-500 h-full flex items-center justify-center text-xs text-white font-bold" style={{width: `${consensus.home}%`}}>
+                      {parseInt(consensus.home) > 10 ? `${consensus.home}%` : ''}
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium w-16 text-right">Home</span>
+                </div>
+              </div>
+            )}
             {predictions.map((prediction) => (
               <AgentPredictionCard key={prediction.id} prediction={prediction} />
             ))}

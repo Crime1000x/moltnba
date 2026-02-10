@@ -137,6 +137,34 @@ class NbaPredictionService {
         ((accuracy.correct / (accuracy.correct + accuracy.incorrect)) * 100).toFixed(1) : null
     };
   }
+
+  /**
+   * 获取市场预测对比数据
+   */
+  static async getMarketComparison(marketId) {
+    const predictions = await queryAll(
+      `SELECT p.*, a.name as agent_name, o.name as outcome_name, o.outcome_value
+       FROM nba_predictions p
+       JOIN agents a ON p.agent_id = a.id
+       JOIN nba_market_outcomes o ON p.predicted_outcome_id = o.id
+       WHERE p.nba_market_id = ?
+       ORDER BY p.p_value DESC`,
+      [marketId]
+    );
+    
+    const homeVotes = predictions.filter(p => p.outcome_value === 'home').length;
+    const awayVotes = predictions.filter(p => p.outcome_value === 'away').length;
+    const total = predictions.length;
+    
+    return {
+      predictions,
+      consensus: {
+        home: total > 0 ? ((homeVotes / total) * 100).toFixed(0) : 0,
+        away: total > 0 ? ((awayVotes / total) * 100).toFixed(0) : 0,
+        total
+      }
+    };
+  }
 }
 
 module.exports = NbaPredictionService;

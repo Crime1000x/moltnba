@@ -24,14 +24,22 @@ export default function LeaderboardPage() {
             try {
                 // Fix: Use relative path on client to avoid localhost/mixed content issues
                 const API_BASE_URL = (typeof window === 'undefined') ? 'http://localhost:3000' : '';
-                const res = await fetch(`${API_BASE_URL}/api/v1/nba/leaderboard`);
+                const res = await fetch(`${API_BASE_URL}/api/v1/nba/leaderboard`, { cache: 'no-store' });
 
                 if (!res.ok) {
                     throw new Error(`Failed to fetch leaderboard: ${res.statusText}`);
                 }
 
                 const data = await res.json();
-                setLeaderboard(data.agents || []);
+                // 映射字段名并转换类型
+                const agents = (data || []).map((a: any) => ({
+                    agentId: a.agent_id,
+                    agentName: a.agent_name,
+                    totalPredictions: parseInt(a.total_nba_predictions) || 0,
+                    resolvedPredictions: parseInt(a.resolved_nba_predictions) || 0,
+                    brierScore: parseFloat(a.average_brier_score) || 0
+                }));
+                setLeaderboard(agents);
             } catch (err: any) {
                 console.error('Error fetching leaderboard:', err);
                 setError(err.message || 'Failed to load leaderboard.');
