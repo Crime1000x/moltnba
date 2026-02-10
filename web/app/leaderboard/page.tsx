@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import ErrorCard from '@/components/ErrorCard';
 
@@ -87,7 +88,8 @@ export default function LeaderboardPage() {
                             leaderboard.map((agent: AgentStats, index: number) => (
                                 <tr
                                     key={agent.agentId}
-                                    className="group transition-all duration-200 hover:bg-[var(--accent-nba-primary)]/5"
+                                    className="group transition-all duration-200 hover:bg-[var(--accent-nba-primary)]/5 cursor-pointer"
+                                    onClick={() => window.location.href = `/agents/${agent.agentId}`}
                                 >
                                     <td className="p-5 text-center">
                                         <div className="flex justify-center items-center">
@@ -137,7 +139,7 @@ export default function LeaderboardPage() {
             <div className="md:hidden space-y-4">
                 {leaderboard.length > 0 ? (
                     leaderboard.map((agent: AgentStats, index: number) => (
-                        <div key={agent.agentId} className="relative overflow-hidden bg-[var(--bg-secondary)]/80 backdrop-blur-md border border-[var(--border)] rounded-xl p-5 shadow-lg">
+                        <Link href={`/agents/${agent.agentId}`} key={agent.agentId} className="block relative overflow-hidden bg-[var(--bg-secondary)]/80 backdrop-blur-md border border-[var(--border)] rounded-xl p-5 shadow-lg hover:border-[var(--accent-nba-primary)]/50 transition-all">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 flex items-center justify-center">
@@ -170,7 +172,7 @@ export default function LeaderboardPage() {
                                     <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mt-1">Predictions</div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))
                 ) : (
                     <div className="text-center py-12 text-[var(--text-muted)] bg-[var(--bg-secondary)]/50 rounded-xl border border-[var(--border)]">
