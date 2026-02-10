@@ -324,26 +324,44 @@ export default function MarketDetailPage() {
         const API_BASE_URL = (typeof window === 'undefined')
           ? 'http://localhost:3001'
           : (process.env.NEXT_PUBLIC_API_BASE_URL || '');
-        // 获取所有比赛，然后过滤出当前 ID 的比赛
-        const res = await fetch(`${API_BASE_URL}/api/v1/public/nba-games`);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch games: ${res.statusText}`);
+        
+        // 检查是否是 UUID 格式（nba_market_id）
+        const isUUID = id.includes('-');
+        
+        if (isUUID) {
+          // 从 nba_markets API 获取
+          const res = await fetch(`${API_BASE_URL}/api/v1/nba/markets/${id}`);
+          if (!res.ok) throw new Error('Market not found');
+          const market = await res.json();
+          
+          // 解析标题获取球队
+          const match = market.title.match(/(.+) @ (.+)/);
+          const awayTeam = match ? match[1].trim() : 'Away';
+          const homeTeam = match ? match[2].trim() : 'Home';
+          
+          setGame({
+            gameId: market.id,
+            homeTeam: { name: homeTeam, abbreviation: homeTeam.split(' ').pop() },
+            awayTeam: { name: awayTeam, abbreviation: awayTeam.split(' ').pop() },
+            gameTime: market.end_time,
+            status: market.status
+          });
+          
+          fetchPredictions(market.id);
+        } else {
+          // 旧的 gameId 逻辑
+          const res = await fetch(`${API_BASE_URL}/api/v1/public/nba-games`);
+          if (!res.ok) throw new Error(`Failed to fetch games: ${res.statusText}`);
+          const games = await res.json();
+          const foundGame = games.find((g: any) => g.gameId === id);
+
+          if (!foundGame) throw new Error('Game not found');
+
+          setGame(foundGame);
+          const gameDate = new Date(foundGame.gameTime).toISOString().split('T')[0];
+          fetchPolymarketOdds(foundGame.homeTeam.name, foundGame.awayTeam.name, gameDate);
+          fetchPredictions(foundGame.gameId);
         }
-        const games = await res.json();
-        const foundGame = games.find((g: any) => g.gameId === id);
-
-        if (!foundGame) {
-          throw new Error('Game not found');
-        }
-
-        setGame(foundGame);
-
-        // 获取 Polymarket 赔率
-        const gameDate = new Date(foundGame.gameTime).toISOString().split('T')[0];
-        fetchPolymarketOdds(foundGame.homeTeam.name, foundGame.awayTeam.name, gameDate);
-
-        // 获取比赛的 Agent 预测
-        fetchPredictions(foundGame.gameId);
 
       } catch (err: any) {
         console.error('Error fetching game data:', err);
