@@ -71,3 +71,26 @@ router.get('/:slug', async (req, res, next) => {
 
 
 module.exports = router;
+
+/**
+ * @route POST /api/nba/markets/:id/resolve
+ * @desc Resolve a market with winning outcome
+ * @access Admin
+ */
+router.post('/:id/resolve', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { winning_outcome_id } = req.body;
+    
+    if (!winning_outcome_id) {
+      return res.status(400).json({ error: 'winning_outcome_id required' });
+    }
+
+    const NbaPredictionService = require('../services/NbaPredictionService');
+    const result = await NbaPredictionService.resolveMarketPredictions(id, winning_outcome_id);
+    
+    res.json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+});

@@ -80,4 +80,19 @@ router.get('/market/:nbaMarketId', async (req, res, next) => {
   }
 });
 
+/**
+ * @route GET /api/nba/predictions/recent
+ * @desc Get recent NBA predictions with agent and market info
+ * @access Public
+ */
+router.get('/recent', async (req, res, next) => {
+  try {
+    const { limit = 10 } = req.query;
+    const predictions = await NbaPredictionService.getRecentPredictions(parseInt(limit));
+    res.json(predictions);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

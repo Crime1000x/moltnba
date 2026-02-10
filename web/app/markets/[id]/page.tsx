@@ -302,10 +302,12 @@ export default function MarketDetailPage() {
       const API_BASE_URL = (typeof window === 'undefined')
         ? 'http://localhost:3001'
         : (process.env.NEXT_PUBLIC_API_BASE_URL || '');
-      const res = await fetch(`${API_BASE_URL}/api/v1/predictions/game/${gameId}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/nba/predictions/market/${gameId}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.success && data.predictions) {
+        if (Array.isArray(data)) {
+          setPredictions(data);
+        } else if (data.success && data.predictions) {
           setPredictions(data.predictions);
         }
       }

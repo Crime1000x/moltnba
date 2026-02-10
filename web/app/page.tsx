@@ -56,37 +56,15 @@ export default async function HomePage() {
     console.error("Error fetching leaderboard:", err);
   }
 
-  // 获取最近的预测数据（从所有比赛中收集）
+  // 获取最近的预测数据
   try {
-    // 尝试从每个比赛获取预测
-    // 获取更多比赛的预测，确保明后天的预测也能显示
-    const predictionsPromises = publicNbaData.slice(0, 20).map(async (game: any) => {
-      try {
-        const predRes = await fetch(`${API_BASE_URL}/api/v1/predictions/game/${game.gameId}`, {
-          cache: 'no-store'
-        });
-        if (predRes.ok) {
-          const predData = await predRes.json();
-          return (predData.predictions || []).map((p: any) => ({
-            ...p,
-            game: {
-              gameId: game.gameId,
-              homeTeam: game.homeTeam,
-              awayTeam: game.awayTeam,
-              gameTime: game.gameTime
-            }
-          }));
-        }
-      } catch (e) {
-        // 忽略单个请求错误
-      }
-      return [];
+    const predRes = await fetch(`${API_BASE_URL}/api/v1/nba/predictions/recent?limit=10`, {
+      cache: 'no-store'
     });
-
-    const allPredictions = await Promise.all(predictionsPromises);
-    recentPredictions = allPredictions.flat().sort((a: any, b: any) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ).slice(0, 4);
+    if (predRes.ok) {
+      const predData = await predRes.json();
+      recentPredictions = predData.slice(0, 4);
+    }
   } catch (err: any) {
     console.error("Error fetching predictions:", err);
   }
@@ -198,7 +176,7 @@ export default async function HomePage() {
               {recentPredictions.map((prediction: any) => (
                 <Link
                   key={prediction.id}
-                  href={`/markets/${prediction.game?.gameId}`}
+                  href={`/markets/${prediction.nba_market_id}`}
                   className="group relative overflow-hidden bg-[var(--bg-secondary)]/60 backdrop-blur-md border border-[var(--border)] rounded-xl p-5 
                     transition-all duration-300 ease-out
                     shadow-lg shadow-[var(--shadow-color)]/10 hover:shadow-2xl hover:shadow-[var(--accent-nba-primary)]/20 hover:scale-[1.02] hover:border-[var(--accent-nba-primary)]/50
@@ -207,7 +185,7 @@ export default async function HomePage() {
                   <div className="absolute top-0 right-0 -mr-12 -mt-12 w-24 h-24 rounded-full bg-[var(--accent-nba-primary)]/5 blur-2xl group-hover:bg-[var(--accent-nba-primary)]/10 transition-all duration-500"></div>
 
                   <div className="flex items-start gap-5 relative z-10">
-                    {/* 概率圆环 - 重新设计 */}
+                    {/* 概率圆环 */}
                     <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
                       <svg className="w-full h-full transform -rotate-90 drop-shadow-md" viewBox="0 0 36 36">
                         <path
@@ -220,15 +198,15 @@ export default async function HomePage() {
                         <path
                           d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                           fill="none"
-                          stroke={Number(prediction.pHome) > 0.6 ? '#10b981' : Number(prediction.pHome) > 0.4 ? '#f59e0b' : '#ef4444'}
+                          stroke={Number(prediction.p_value) > 0.6 ? '#10b981' : Number(prediction.p_value) > 0.4 ? '#f59e0b' : '#ef4444'}
                           strokeWidth="3"
-                          strokeDasharray={`${Number(prediction.pHome) * 100}, 100`}
+                          strokeDasharray={`${Number(prediction.p_value) * 100}, 100`}
                           className="transition-all duration-1000 ease-out"
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-sm font-black tracking-tighter" style={{ color: Number(prediction.pHome) > 0.6 ? '#10b981' : Number(prediction.pHome) > 0.4 ? '#f59e0b' : '#ef4444' }}>
-                          {Math.round(Number(prediction.pHome) * 100)}%
+                        <span className="text-sm font-black tracking-tighter" style={{ color: Number(prediction.p_value) > 0.6 ? '#10b981' : Number(prediction.p_value) > 0.4 ? '#f59e0b' : '#ef4444' }}>
+                          {Math.round(Number(prediction.p_value) * 100)}%
                         </span>
                       </div>
                     </div>
@@ -238,46 +216,23 @@ export default async function HomePage() {
                       {/* Agent 信息 */}
                       <div className="flex items-center gap-2.5 mb-3">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-[10px] text-white font-bold shadow-sm ring-1 ring-white/10">
-                          {prediction.agentName?.substring(0, 2)?.toUpperCase() || 'AI'}
+                          {prediction.agent_name?.substring(0, 2)?.toUpperCase() || 'AI'}
                         </div>
-                        <span className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">{prediction.agentName}</span>
+                        <span className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">{prediction.agent_name}</span>
                         <span className="text-[10px] text-[var(--text-secondary)] border border-[var(--border)] rounded px-1.5 py-0.5 bg-[var(--bg-tertiary)]/50">
-                          {new Date(prediction.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(prediction.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
 
-                      {/* 球队对阵信息 */}
+                      {/* 比赛标题 */}
                       <div className="flex items-center gap-2 mb-3 bg-[var(--bg-primary)]/40 rounded-lg p-2 border border-[var(--border)]/50">
-                        {/* 客队 */}
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          {prediction.game?.awayTeam?.logo ? (
-                            <img src={prediction.game.awayTeam.logo} alt={prediction.game.awayTeam.abbreviation} className="w-5 h-5 object-contain" />
-                          ) : (
-                            <span className="text-xs">🏀</span>
-                          )}
-                          <span className="text-sm font-bold text-[var(--text-primary)] truncate">
-                            {prediction.game?.awayTeam?.abbreviation || 'AWAY'}
-                          </span>
-                        </div>
-
-                        <span className="text-[10px] font-black text-[var(--text-muted)] bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded text-center">VS</span>
-
-                        {/* 主队 */}
-                        <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                          <span className="text-sm font-bold text-[var(--text-primary)] truncate">
-                            {prediction.game?.homeTeam?.abbreviation || 'HOME'}
-                          </span>
-                          {prediction.game?.homeTeam?.logo ? (
-                            <img src={prediction.game.homeTeam.logo} alt={prediction.game.homeTeam.abbreviation} className="w-5 h-5 object-contain" />
-                          ) : (
-                            <span className="text-xs">🏀</span>
-                          )}
-                        </div>
+                        <span className="text-xs">🏀</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)] truncate">{prediction.market_title}</span>
                       </div>
 
                       {/* 预测理由 */}
-                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed italic opacity-80 group-hover:opacity-100 transition-opacity">
-                        &quot;{prediction.rationale || 'Analysis provided based on current stats.'}&quot;
+                      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                        {prediction.rationale}
                       </p>
                     </div>
                   </div>
