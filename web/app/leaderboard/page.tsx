@@ -24,7 +24,7 @@ export default function LeaderboardPage() {
             try {
                 // Fix: Use relative path on client to avoid localhost/mixed content issues
                 const API_BASE_URL = (typeof window === 'undefined') ? 'http://localhost:3000' : '';
-                const res = await fetch(`${API_BASE_URL}/api/v1/agents/leaderboard`);
+                const res = await fetch(`${API_BASE_URL}/api/v1/nba/leaderboard`);
 
                 if (!res.ok) {
                     throw new Error(`Failed to fetch leaderboard: ${res.statusText}`);
